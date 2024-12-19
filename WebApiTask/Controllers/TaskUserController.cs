@@ -180,10 +180,10 @@ namespace WebApiTask.Controllers
         [HttpDelete]
         [Route("{IdTask:int}")]
         [ValidateModel]
-        public async Task< IActionResult> DeleteTask([FromBody] int IdTask)
+        public async Task< IActionResult> DeleteAsync([FromBody] int IdTask)
 
         {
-            var taskuser = await dbContext.TaskUsers.FirstOrDefaultAsync(x => x.IdTask == IdTask);
+            var taskuser = await taskRepository.DeleteAsync(IdTask); 
 
 
             if (taskuser == null)
@@ -192,9 +192,7 @@ namespace WebApiTask.Controllers
             }
 
             //delete region
-             dbContext.TaskUsers.Remove(taskuser);
-         await dbContext.SaveChangesAsync();
-
+           
             // retuer  delete task back
 
 

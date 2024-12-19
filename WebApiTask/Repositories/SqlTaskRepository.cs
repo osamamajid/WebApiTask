@@ -75,6 +75,11 @@ namespace WebApiTask.Repositories
             dbContext.TaskUsers.Remove(exitstingTaskUser);
             await dbContext.SaveChangesAsync();
             return exitstingTaskUser;
-        } 
+        }
+
+        public Task<TaskUser> UpdateAsync(int idTask, UpdataTaskRequestDto updataTaskRequestDto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
