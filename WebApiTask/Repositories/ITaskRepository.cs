@@ -10,7 +10,8 @@ namespace WebApiTask.Repositories
         Task<TaskUser> GetByIdAsync(int IdTask);
         Task<TaskUser> CreateAsync(TaskUser taskUser);
         Task<TaskUser> UpdateAsync(int IdTask, TaskUser taskUser);
-        Task UpdateAsync(int idTask, UpdataTaskRequestDto updataTaskRequestDto);
+        Task<TaskUser> UpdateAsync(int idTask, UpdataTaskRequestDto updataTaskRequestDto);
+        Task<TaskUser> DeleteAsync(int idTask);
     }
-}
+} 
  

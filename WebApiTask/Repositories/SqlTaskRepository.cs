@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebApiTask.data;
 using WebApiTask.Models;
+using WebApiTask.Models.Dto;
 
 namespace WebApiTask.Repositories
 {
@@ -26,20 +27,19 @@ namespace WebApiTask.Repositories
             throw new NotImplementedException();
         }
 
+    
+
         public async Task<List<TaskUser>> GetAllTaskUser()
         {
             return await   dbContext.TaskUsers.ToListAsync();
         }
 
-        public async Task<TaskUser?> GetById(int IdTask)
+        public async Task<TaskUser?> GetByIdAsync(int IdTask)
         {
             return await dbContext.TaskUsers.FirstOrDefaultAsync(x => x.IdTask == IdTask);
         }
 
-        public Task<TaskUser> GetByIdAsync(int IdTask)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         
         public async Task<TaskUser> UpdateAsync(int IdTask, TaskUser taskUser)
@@ -62,5 +62,19 @@ namespace WebApiTask.Repositories
             await dbContext.SaveChangesAsync();
             return exitstingTaskUser;
         }
+
+        
+
+        public  async Task<TaskUser> DeleteAsync(int IdTask)
+        {
+            var exitstingTaskUser = await dbContext.TaskUsers.FirstOrDefaultAsync(x => x.IdTask == IdTask);
+            if(exitstingTaskUser != null)
+            {
+                return null;
+            }
+            dbContext.TaskUsers.Remove(exitstingTaskUser);
+            await dbContext.SaveChangesAsync();
+            return exitstingTaskUser;
+        } 
     }
 }
