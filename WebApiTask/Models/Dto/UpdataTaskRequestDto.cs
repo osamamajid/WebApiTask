@@ -2,7 +2,7 @@
 
 namespace WebApiTask.Models.Dto
 {
-    public class UpdataTaskRequest
+    public class UpdataTaskRequestDto
     {
          
 

@@ -6,6 +6,7 @@ using WebApiTask.CustomActionFilers;
 using WebApiTask.data;
 using WebApiTask.Models;
 using WebApiTask.Models.Dto;
+using WebApiTask.Repositories;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebApiTask.Controllers
@@ -17,25 +18,27 @@ namespace WebApiTask.Controllers
     public class TaskUserController : ControllerBase
     {
         private readonly UserDbContext dbContext;
+        private readonly ITaskRepository taskRepository;
 
-        public TaskUserController(UserDbContext dbContext)
+        public TaskUserController(UserDbContext dbContext, ITaskRepository taskRepository)
         {
             this.dbContext = dbContext;
+            this.taskRepository = taskRepository;
         }
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult GetAllTaskUser()
+        public  async Task<IActionResult> GetAllTaskUser()
         { 
 
             
-            var taskuser = dbContext.TaskUsers.ToList();//get data from data base
+            var taskuser = await  taskRepository.GetAllTaskUser();//get data from data base
                                                       
-            var taskDto = new List<TaskUserDto>();  // Map Model Domin to DTo
+            var taskDto = new List<TaskUserDto>();  // Map Model Domin to DTo 
             foreach (var taskUser in taskuser)
             {
                 taskDto.Add(new TaskUserDto()
 
-                {
+                { 
                      IdTask =taskUser.IdTask,
                      AudioUrl =taskUser.AudioUrl,   
                      Created  =  DateTime.Now,
@@ -65,10 +68,10 @@ namespace WebApiTask.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("{IdTask:int}")]
-      
-        public IActionResult GetId([FromRoute] int IdTask)
+
+        public async Task <IActionResult> GetByIdAsync([FromRoute] int IdTask)
         {
-            var taskuser = dbContext.TaskUsers.FirstOrDefault(x => x.IdTask == IdTask);
+            var taskuser = await taskRepository.GetByIdAsync(IdTask);
             if (taskuser == null)
             {
                 return NotFound();
@@ -98,26 +101,30 @@ namespace WebApiTask.Controllers
         [HttpPut]
         [Route("{IdTask:int}")]
         [ValidateModel]
-        public IActionResult Update([FromRoute] int IdTask, UpdataTaskRequest updataTaskRequest)
+        public async Task <IActionResult> UpdateAsync([FromRoute] int IdTask, UpdataTaskRequestDto updataTaskRequestDto)
 
         {
-            var taskuser = dbContext.TaskUsers.FirstOrDefault(x => x.IdTask == IdTask);
-            if (taskuser == null)
+            var taskuser = new TaskUser
+
+            {
+                TaskTitle = updataTaskRequestDto.TaskTitle,
+                TaskDetails = updataTaskRequestDto.TaskDetails,
+                ImageUrl = updataTaskRequestDto.ImageUrl,
+                AudioUrl = updataTaskRequestDto.AudioUrl,
+                VideoUrl = updataTaskRequestDto.VideoUrl,
+                Updated = DateTime.Now,
+          
+            };
+
+            taskuser = await taskRepository.UpdateAsync(IdTask, taskuser);
+                if (taskuser == null) 
             {
                 return NotFound();
 
             }
-                     
 
-            taskuser.TaskTitle = updataTaskRequest.TaskTitle;
-            taskuser.TaskDetails = updataTaskRequest.TaskDetails;
-            taskuser.ImageUrl = updataTaskRequest.ImageUrl;
-            taskuser.AudioUrl = updataTaskRequest.AudioUrl;
-            taskuser.VideoUrl = updataTaskRequest.VideoUrl;
-            taskuser.Updated = DateTime.Now;
-            dbContext.SaveChanges();
 
-            var userTaskDto = new TaskUserDto
+            return Ok(new TaskUserDto
             {
                 TaskTitle = taskuser.TaskTitle,
                 TaskDetails = taskuser.TaskDetails,
@@ -125,15 +132,13 @@ namespace WebApiTask.Controllers
                 AudioUrl = taskuser.AudioUrl,
                 VideoUrl = taskuser.VideoUrl,
                 Updated = taskuser.Updated
-            };
-
-            return Ok(userTaskDto);
+            });
         }
 
         [AllowAnonymous]
         [HttpPost]
         [ValidateModel]
-        public IActionResult Create( int IdTask ,[FromBody] AddTaskUserRequestDto addTaskUserRequestDto)  
+        public async Task<IActionResult> CreateAsync( int IdTask ,[FromBody] AddTaskUserRequestDto addTaskUserRequestDto)  
         {
             // تحويل DTO إلى نموذج Domin
             var userTask = new TaskUser
@@ -151,8 +156,8 @@ namespace WebApiTask.Controllers
             };
 
             // إضافة Task إلى قاعدة البيانات
-            dbContext.TaskUsers.Add(userTask);
-            dbContext.SaveChanges();
+            userTask= await  taskRepository.CreateAsync(userTask);
+            await dbContext.SaveChangesAsync();
 
             // تحويل  domin model النموذج إلى Dto
             var userTaskDto = new TaskUserDto
@@ -167,7 +172,7 @@ namespace WebApiTask.Controllers
             };              
 
             
-            return CreatedAtAction(nameof(GetId), new { IdTask = userTask.IdTask }, userTaskDto);
+            return CreatedAtAction(nameof(GetByIdAsync), new { IdTask = userTask.IdTask }, userTaskDto);
         }
 
 
@@ -175,10 +180,10 @@ namespace WebApiTask.Controllers
         [HttpDelete]
         [Route("{IdTask:int}")]
         [ValidateModel]
-        public IActionResult DeleteTask([FromBody] int IdTask)
+        public async Task< IActionResult> DeleteTask([FromBody] int IdTask)
 
         {
-            var taskuser = dbContext.TaskUsers.SingleOrDefault(x => x.IdTask == IdTask);
+            var taskuser = await dbContext.TaskUsers.FirstOrDefaultAsync(x => x.IdTask == IdTask);
 
 
             if (taskuser == null)
@@ -187,8 +192,8 @@ namespace WebApiTask.Controllers
             }
 
             //delete region
-            dbContext.TaskUsers.Remove(taskuser);
-            dbContext.SaveChanges();
+             dbContext.TaskUsers.Remove(taskuser);
+         await dbContext.SaveChangesAsync();
 
             // retuer  delete task back
 

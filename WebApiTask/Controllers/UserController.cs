@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApiTask.CustomActionFilers;
 using WebApiTask.data;
 using WebApiTask.Models;
@@ -22,11 +23,11 @@ namespace WebApiTask.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-       
-        public IActionResult GetAll()
+
+        public async Task <IActionResult> GetAll()
         {
             // جلب البيانات من قاعدة البيانات وتحويلها إلى    Dto
-            var userDto = dbContext.Users
+            var userDto = await dbContext.Users
                 .Select(user => new UserDto
                 {
                     UserId = user.UserId,
@@ -35,17 +36,17 @@ namespace WebApiTask.Controllers
                     Password = user.Password
 
                 })
-                .ToList();
+                .ToListAsync();
 
             return Ok(userDto);
         }
 
         [AllowAnonymous]
         [HttpGet("{UserId:int}")]
-         
-        public IActionResult GetById([FromRoute] int UserId)
+
+        public async Task <IActionResult> GetById([FromRoute] int UserId)
         {
-            var user = dbContext.Users.FirstOrDefault(x => x.UserId == UserId);
+            var user =  await dbContext.Users.FirstOrDefaultAsync(x => x.UserId == UserId);
             if (user == null)
             {
                 return NotFound();
@@ -65,8 +66,8 @@ namespace WebApiTask.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-      //  [ValidateModel]
-        public IActionResult Create([FromBody] AddUserRequestDto addUserRequestDto)
+        //  [ValidateModel]
+        public async Task < IActionResult> Create([FromBody] AddUserRequestDto addUserRequestDto)
         {
             // تحويل DTO إلى نموذج Domin
             var user = new User
@@ -77,8 +78,8 @@ namespace WebApiTask.Controllers
 
             };
 
-            dbContext.Users.Add(user);
-            dbContext.SaveChanges();
+          await  dbContext.Users.AddAsync(user);
+            dbContext.SaveChangesAsync();
 
             // تحويل النموذج إلى Dto
             var userDto = new UserDto
@@ -97,11 +98,11 @@ namespace WebApiTask.Controllers
         [HttpPut]
         [Route("{UserId:int}")]
         //[ValidateModel]
-        public IActionResult Update([FromRoute] int UserId, [FromBody] UpdateUserRequestDto updateUserRequestDto)
+        public async Task <IActionResult> Update([FromRoute] int UserId, [FromBody] UpdateUserRequestDto updateUserRequestDto)
 
         {
 
-            var userDominModel = dbContext.Users.FirstOrDefault(x => x.UserId == UserId);
+            var userDominModel = await dbContext.Users.FirstOrDefaultAsync(x => x.UserId == UserId);
 
             if (userDominModel == null)
             {
@@ -111,7 +112,7 @@ namespace WebApiTask.Controllers
             userDominModel.Email = updateUserRequestDto.Email;
             userDominModel.Password = updateUserRequestDto.Password;    
 
-            dbContext.SaveChanges();
+            dbContext.SaveChangesAsync();
             var userDto = new User
             {
 
@@ -128,18 +129,18 @@ namespace WebApiTask.Controllers
         [HttpDelete]
         [Route("{UserId:int}")]
         [ValidateModel]
-        public IActionResult Delete([FromRoute] int UserId)
+        public async Task <IActionResult> Delete([FromRoute] int UserId)
 
 
         {
-            var userDominModel = dbContext.Users.FirstOrDefault(x => x.UserId == UserId);
+            var userDominModel = await dbContext.Users.FirstOrDefaultAsync(x => x.UserId == UserId);
             if (userDominModel == null)
             {
                 return NotFound();
             }
 
             dbContext.Users.Remove(userDominModel);
-            dbContext.SaveChanges();
+            dbContext.SaveChangesAsync();
 
             var userDto = new User
             {

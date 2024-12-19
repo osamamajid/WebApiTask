@@ -52,6 +52,26 @@ namespace WebApiTask.Controllers
             return BadRequest(" Something went Wrong ");
         }
 
-         
+
+        [HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
+        {
+            var user = await userManager.FindByEmailAsync(loginRequestDto.UserName);
+            if (user == null)
+            {
+                var checkPasswordResult = await userManager.ChangePasswordAsync(user, loginRequestDto.Password );
+                {
+                    // create token
+
+                    return Ok();
+
+                }
+            }
+
+            return BadRequest("UserName Or Password in correct!");
+
+        }
+
     }
 }

@@ -5,12 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WebApiTask.data;
+using WebApiTask.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // ﬂÊœ «·œ« «database
 builder.Services.AddDbContext<UserDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UserDbConnectionString")) );
+builder.Services.AddScoped<ITaskRepository, SqlTaskRepository>();
 builder.Services.AddDbContext<UserAuthDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UserAuthDbConnectionString")) );
 // ﬂ «»… Â–« «·ﬂÊœAuthentication
 builder.Services.AddIdentityCore<IdentityUser>().AddRoles<IdentityRole>().AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("UserAuth").AddEntityFrameworkStores<UserAuthDbContext>().AddDefaultTokenProviders();
@@ -39,6 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 
 );
+
 
 var app = builder.Build();
 
