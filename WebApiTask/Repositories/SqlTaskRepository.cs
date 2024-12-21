@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data;
+using Microsoft.EntityFrameworkCore;
 using WebApiTask.data;
 using WebApiTask.Models;
 using WebApiTask.Models.Dto;
@@ -42,26 +43,7 @@ namespace WebApiTask.Repositories
         
 
         
-        public async Task<TaskUser> UpdateAsync(int IdTask, TaskUser taskUser)
-        {
-            var exitstingTaskUser = await dbContext.TaskUsers.FirstOrDefaultAsync(x => x.IdTask == IdTask);
-                if (exitstingTaskUser != null)
-            {
-                return null;
-            }
-            exitstingTaskUser.IdTask =taskUser.IdTask;
-           exitstingTaskUser.TaskTitle = taskUser.TaskTitle;
-            exitstingTaskUser.TaskDetails = taskUser.TaskDetails;
-            exitstingTaskUser.AudioUrl = taskUser.AudioUrl;
-            exitstingTaskUser.ImageUrl = taskUser.ImageUrl;
-            exitstingTaskUser.VideoUrl  = taskUser.VideoUrl ;
-            exitstingTaskUser.IsCompleted   = taskUser.IsCompleted;
-            exitstingTaskUser.Created  = taskUser. Created ;
-            exitstingTaskUser.Updated   = taskUser.Updated ;
-
-            await dbContext.SaveChangesAsync();
-            return exitstingTaskUser;
-        }
+    
 
         
 
@@ -77,9 +59,25 @@ namespace WebApiTask.Repositories
             return exitstingTaskUser;
         }
 
-        public Task<TaskUser> UpdateAsync(int idTask, UpdataTaskRequestDto updataTaskRequestDto)
+        public async Task<TaskUser> UpdateAsync(int IdTask, UpdataTaskRequestDto updataTaskRequestDto)
         {
-            throw new NotImplementedException();
+            var exitstingTaskUser = await dbContext.TaskUsers.FirstOrDefaultAsync(x => x.IdTask == IdTask);
+            if (exitstingTaskUser != null)
+            {
+                return null;
+            }
+         
+            exitstingTaskUser.TaskTitle = updataTaskRequestDto.TaskTitle;
+            exitstingTaskUser.TaskDetails = updataTaskRequestDto.TaskDetails;
+            exitstingTaskUser.AudioUrl = updataTaskRequestDto.AudioUrl;
+            exitstingTaskUser.ImageUrl = updataTaskRequestDto.ImageUrl;
+            exitstingTaskUser.VideoUrl = updataTaskRequestDto.VideoUrl;
+            exitstingTaskUser.IsCompleted = updataTaskRequestDto.IsCompleted;
+            exitstingTaskUser.Created = DateTime.Now;
+            exitstingTaskUser.Updated = DateTime.Now;
+
+            await dbContext.SaveChangesAsync();
+            return exitstingTaskUser;
         }
     }
 }
