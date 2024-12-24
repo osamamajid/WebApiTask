@@ -17,8 +17,8 @@ namespace WebApiTask.data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            var readerRoleId = "2";
-            var writerRoleId = "4";
+            var readerRoleId = "1";
+            var writerRoleId = "2";
             var roles = new List<IdentityRole>
             {
                 new IdentityRole

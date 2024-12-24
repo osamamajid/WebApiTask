@@ -1,9 +1,15 @@
-﻿namespace WebApiTask.Models.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebApiTask.Models.Dto
 {
     public class LoginRequestDto
     {
-        public string? UserName { get; set; }
+
+        [Required]
+        [DataType(DataType.EmailAddress)]
         public string? Email { get; set; }
+        [Required]
+        [DataType(DataType.Password)]
         public string? Password { get; set; }
     }
 }

@@ -57,19 +57,21 @@ namespace WebApiTask.Controllers
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
         {
-            var user = await userManager.FindByEmailAsync(loginRequestDto.UserName);
-            if (user == null)
+            var user = await userManager.FindByEmailAsync(loginRequestDto.Email);
+            if (user != null)
             {
-                var checkPasswordResult = await userManager.ChangePasswordAsync(user, loginRequestDto.Password );
+                var checkPasswordResult = await userManager.CheckPasswordAsync(user, loginRequestDto.Password );
+                if (checkPasswordResult)
                 {
                     // create token
 
-                    return Ok();
+
+                    return Ok("secess login");
 
                 }
             }
 
-            return BadRequest("UserName Or Password in correct!");
+            return BadRequest("User Name Or Password in correct!");
 
         }
 
